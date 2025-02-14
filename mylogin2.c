@@ -13,6 +13,8 @@
 /* Define some constants. */
 #define USERNAME_SIZE (32)
 #define NOUSER (-1)
+#define PASSWORD_AGE_LIMIT (2)
+#define MAX_FAILED_ATTEMPTS (5)
 
 
 int print_info(const char *username)
@@ -41,11 +43,28 @@ int authenticate(const char *username)
   } else {
     const char* input_Passwd = getpass("Password: "); // no echoing
     const char* encrypted_input_Passwd = crypt(input_Passwd, p->pw_passwd);
+    if (p->pw_failed > MAX_FAILED_ATTEMPTS){
+      return -1; 
+    }
 
     // compare encrypted passwords
     if (strcmp(encrypted_input_Passwd, p->pw_passwd) == 0){
+      p->pw_failed = 0;
+      p->pw_age++;
+      // Check if password age is greater than the limit
+      if (p->pw_age > PASSWORD_AGE_LIMIT) {
+          printf("Warning: It's been more than %d successful logins. Please consider changing your password.\n", PASSWORD_AGE_LIMIT);
+      }
+      pwdb_update_user(p);
       return 1; 
     }
+    p->pw_failed++;
+    // Lock account if failed attempts exceed limit
+    if (p->pw_failed > MAX_FAILED_ATTEMPTS) {
+        pwdb_update_user(p);
+        return -1; 
+    }
+    pwdb_update_user(p);
     return 0; 
   }
 }
@@ -70,11 +89,15 @@ int main(int argc, char **argv)
   while(1)
   {
     read_username(username);
-    if (authenticate(username)) {
+    int autent = authenticate(username); 
+    if (autent == 1) {
       printf("User authenticated successfully.\n");
       return 0; 
-    } else {
+    } else if (autent == 0){
       printf("Unknown user or incorrect password.\n");
+    } else if (autent == -1){
+      printf("Account locked due to too many failed login attempts. Contact the administrator to unlock.\n");
+      return 0; 
     }
   }
 }
