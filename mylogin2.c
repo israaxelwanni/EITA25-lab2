@@ -13,7 +13,7 @@
 /* Define some constants. */
 #define USERNAME_SIZE (32)
 #define NOUSER (-1)
-#define PASSWORD_AGE_LIMIT (2)
+#define PASSWORD_AGE_LIMIT (10)
 #define MAX_FAILED_ATTEMPTS (5)
 
 
