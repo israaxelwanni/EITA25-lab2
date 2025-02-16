@@ -17,8 +17,14 @@ int main() {
   pid_t pid; 
   int status;
 
-  printf("uid = %d, gid = %d, euid = %d, egid = %d\n", getuid(), getgid(), geteuid(), getegid());
+  printf("uid = %d, gid = %d, euid = %d, egid = %d\n", getuid(), getgid(), geteuid(), getegid()); // prints the user and group IDs of the process
 
+  // creates a new process by duplicating the calling process (the parent).
+  /*
+  returns:
+  - 0 to the child process (newly created process).
+  - pid (process ID of the child) to the parent process.
+  */
   pid = fork();
 
   if (pid==0) {
