@@ -49,10 +49,14 @@ int authenticate(const char *username)
     return 0; 
   }
 }
+void nothing(){
+
+}
 
 void read_username(char *username)
 {
   printf("login: ");
+  signal(SIGINT, nothing); 
   fgets(username, USERNAME_SIZE, stdin);
 
   /* remove the newline included by getline() */
